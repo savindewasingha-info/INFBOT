@@ -1,0 +1,27 @@
+[phases.setup]
+nixPkgs = [
+  "nodejs_20",
+  "ffmpeg",
+  "pkg-config",
+  "cairo",
+  "pango",
+  "libpng",
+  "libjpeg",
+  "giflib",
+  "librsvg",
+  "pixman",
+  "python3",
+  "git",
+  "gcc",
+  "gnumake"
+]
+aptPkgs = []
+
+[phases.install]
+cmds = ["PUPPETEER_SKIP_DOWNLOAD=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install --legacy-peer-deps"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "node index.js"

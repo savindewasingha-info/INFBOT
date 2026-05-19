@@ -1,0 +1,12 @@
+node_modules/
+session/
+tmp/
+.local/
+.env
+*.log
+database/*.json
+
+# Database runtime files
+*.db
+*.db-shm
+*.db-wal

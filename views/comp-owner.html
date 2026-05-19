@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity MD — Competition Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#04040c;--surface:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.08);--purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.15);--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#f1f5f9;--dim:rgba(255,255,255,0.45);--muted:rgba(255,255,255,0.3)}
+    html,body{min-height:100vh}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    .bg-mesh{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 55% at 50% -10%,rgba(139,92,246,0.14),transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(6,182,212,0.08),transparent 60%)}
+    .grid-lines{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(139,92,246,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.03) 1px,transparent 1px);background-size:60px 60px}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(4,4,12,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 20px;justify-content:space-between}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;background:linear-gradient(135deg,#a78bfa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .badge-owner{background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#67e8f9;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+    .btn-logout{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;font-size:.8rem;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+    .btn-logout:hover{background:rgba(239,68,68,0.2)}
+    .nav-right{display:flex;align-items:center;gap:12px}
+
+    .main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:80px 20px 40px}
+    h1{font-size:1.7rem;font-weight:800;margin-bottom:4px}
+    .sub{color:var(--dim);font-size:.9rem;margin-bottom:28px}
+
+    .tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+    .tab{padding:8px 20px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--dim);transition:all .2s;background:var(--surface)}
+    .tab.active{background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.4);color:#a78bfa}
+
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px}
+    .card-title{font-size:.82rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+    .section{display:none}
+    .section.active{display:block}
+
+    .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+    label{display:block;font-size:.78rem;font-weight:600;color:var(--dim);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+    input,select{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
+    input:focus,select:focus{border-color:rgba(139,92,246,0.5)}
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator{filter:invert(0.6)}
+    select option{background:#0a0a18}
+    .hint{font-size:.76rem;color:var(--muted);margin-top:4px}
+    .btn{padding:10px 20px;border-radius:10px;font-size:.88rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:7px}
+    .btn-primary{background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff}
+    .btn-primary:hover{opacity:.9}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+    .btn-danger:hover{background:rgba(239,68,68,0.2)}
+    .btn-sm{padding:6px 14px;font-size:.8rem}
+
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{text-align:left;padding:10px 12px;font-size:.75rem;font-weight:600;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+    td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(255,255,255,0.02)}
+
+    .pill{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-block}
+    .pill-active{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7}
+    .pill-ended{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+    .pill-code{background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);color:#a78bfa;font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.08em}
+    .pill-none{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted)}
+    .pill-pass{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7}
+    .pill-elim{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+    .pts{color:#10b981;font-weight:700}
+    .pts-low{color:#ef4444;font-weight:700}
+    .rank1{color:#f59e0b;font-weight:800}
+
+    .comp-selector{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+    .comp-selector label{margin:0;white-space:nowrap}
+
+    .toast{position:fixed;bottom:24px;right:24px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;padding:12px 20px;border-radius:12px;font-size:.88rem;font-weight:600;z-index:999;animation:slideIn .3s ease}
+    .toast.err{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5}
+    @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    .empty{color:var(--muted);font-size:.9rem;text-align:center;padding:24px}
+    @media(max-width:600px){.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="grid-lines"></div>
+
+<nav>
+  <div class="nav-brand"><span>⚡</span> Competition Panel</div>
+  <div class="nav-right">
+    <span class="badge-owner">Owner</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="main">
+  <h1>🏆 Competition Management</h1>
+  <p class="sub">Create competitions, manage competitors, and track the leaderboard.</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showSection('competitions')">📋 Competitions</div>
+    <div class="tab" onclick="showSection('competitors')">👤 Competitors</div>
+    <div class="tab" onclick="showSection('leaderboard')">📊 Leaderboard</div>
+  </div>
+
+  <!-- Competitions Section -->
+  <div class="section active" id="sec-competitions">
+    <div class="card">
+      <div class="card-title">➕ Create New Competition</div>
+      <div class="form-row">
+        <div>
+          <label>Competition Name</label>
+          <input type="text" id="newCompName" placeholder="e.g. April Challenge 2026">
+        </div>
+        <div>
+          <label>End Date &amp; Time</label>
+          <input type="datetime-local" id="newCompEndDate">
+          <div class="hint">Leave blank for no end date</div>
+        </div>
+        <div>
+          <label>Min. Points (to qualify)</label>
+          <input type="number" id="newCompMinPts" value="10" min="1" max="9999">
+          <div class="hint">Competitors below this are eliminated</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="createCompetition()">➕ Create Competition</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 All Competitions</div>
+      <div id="compList"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- Competitors Section -->
+  <div class="section" id="sec-competitors">
+    <div class="card">
+      <div class="card-title">➕ Add Competitor</div>
+      <div class="form-row">
+        <div>
+          <label>First Name</label>
+          <input type="text" id="newFirstName" placeholder="John">
+        </div>
+        <div>
+          <label>Username</label>
+          <input type="text" id="newUsername" placeholder="john_2026">
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" id="newPassword" placeholder="Set a password">
+        </div>
+        <div>
+          <label>Competition</label>
+          <select id="newCompId"><option value="">— Select Competition —</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addCompetitor()">➕ Add Competitor</button>
+    </div>
+    <div class="card">
+      <div class="card-title">👤 Manage Competitors</div>
+      <div class="comp-selector">
+        <label>Filter by competition:</label>
+        <select id="filterComp" style="width:auto;min-width:200px" onchange="loadCompetitors()">
+          <option value="">All Competitions</option>
+        </select>
+      </div>
+      <div id="compitorList"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Section -->
+  <div class="section" id="sec-leaderboard">
+    <div class="card">
+      <div class="card-title">📊 Live Leaderboard</div>
+      <div class="comp-selector">
+        <label>Competition:</label>
+        <select id="lbComp" style="width:auto;min-width:200px" onchange="loadLeaderboard()">
+          <option value="">All Competitions</option>
+        </select>
+      </div>
+      <div id="lbTable"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let competitions = [];
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  const idx = ['competitions','competitors','leaderboard'].indexOf(name);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  if (name === 'competitors') loadCompetitors();
+  if (name === 'leaderboard') loadLeaderboard();
+}
+
+function toast(msg, err = false) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (err ? ' err' : '');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function logout() {
+  await fetch('/comp-owner/logout', { method: 'POST' });
+  window.location.href = '/comp-owner';
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function populateSelects() {
+  const opts = competitions.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  document.getElementById('newCompId').innerHTML = '<option value="">— Select Competition —</option>' + opts;
+  document.getElementById('filterComp').innerHTML = '<option value="">All Competitions</option>' + opts;
+  document.getElementById('lbComp').innerHTML = '<option value="">All Competitions</option>' + opts;
+}
+
+async function loadCompetitions() {
+  const r = await fetch('/comp-owner/api/competitions');
+  if (!r.ok) { window.location.href = '/comp-owner'; return; }
+  competitions = await r.json();
+  populateSelects();
+  const el = document.getElementById('compList');
+  if (!competitions.length) { el.innerHTML = '<div class="empty">No competitions yet. Create one above.</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Name</th><th>Status</th><th>End Date</th><th>Min Points</th><th>Created</th><th></th></tr></thead>
+    <tbody>${competitions.map(c => `<tr>
+      <td style="font-weight:600">${esc(c.name)}</td>
+      <td>${c.ended ? '<span class="pill pill-ended">Ended</span>' : '<span class="pill pill-active">Active</span>'}</td>
+      <td style="color:var(--dim);font-size:.82rem">${fmtDate(c.endDate)}</td>
+      <td style="color:var(--yellow);font-weight:700">${c.minPoints != null ? c.minPoints : 10}</td>
+      <td style="color:var(--dim);font-size:.82rem">${new Date(c.createdAt).toLocaleDateString()}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteCompetition('${c.id}')">Delete</button></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+async function createCompetition() {
+  const name = document.getElementById('newCompName').value.trim();
+  if (!name) { toast('Enter a competition name', true); return; }
+  const endDateVal = document.getElementById('newCompEndDate').value;
+  const minPoints = parseInt(document.getElementById('newCompMinPts').value) || 10;
+  const endDate = endDateVal ? new Date(endDateVal).getTime() : null;
+  const r = await fetch('/comp-owner/api/competitions', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, endDate, minPoints })
+  });
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('newCompName').value = '';
+    document.getElementById('newCompEndDate').value = '';
+    document.getElementById('newCompMinPts').value = '10';
+    toast('Competition created!');
+    loadCompetitions();
+  } else toast(d.message || 'Failed', true);
+}
+
+async function deleteCompetition(id) {
+  if (!confirm('Delete this competition? This does not delete competitors.')) return;
+  const r = await fetch('/comp-owner/api/competitions/' + id, { method: 'DELETE' });
+  const d = await r.json();
+  if (d.success) { toast('Deleted'); loadCompetitions(); }
+  else toast(d.message || 'Failed', true);
+}
+
+async function addCompetitor() {
+  const firstName = document.getElementById('newFirstName').value.trim();
+  const username = document.getElementById('newUsername').value.trim();
+  const password = document.getElementById('newPassword').value;
+  const competitionId = document.getElementById('newCompId').value;
+  if (!firstName || !username || !password || !competitionId) { toast('Fill all fields', true); return; }
+  const r = await fetch('/comp-owner/api/competitors', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ firstName, username, password, competitionId }) });
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('newFirstName').value = '';
+    document.getElementById('newUsername').value = '';
+    document.getElementById('newPassword').value = '';
+    toast('Competitor added!');
+    loadCompetitors();
+  } else toast(d.message || 'Failed', true);
+}
+
+async function loadCompetitors() {
+  const compId = document.getElementById('filterComp').value;
+  const url = '/comp-owner/api/competitors' + (compId ? '?competitionId=' + encodeURIComponent(compId) : '');
+  const r = await fetch(url);
+  if (!r.ok) return;
+  const list = await r.json();
+  const el = document.getElementById('compitorList');
+  if (!list.length) { el.innerHTML = '<div class="empty">No competitors yet.</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Name</th><th>Username</th><th>Competition</th><th>Code</th><th>Points</th><th></th></tr></thead>
+    <tbody>${list.map(c => {
+      const comp = competitions.find(x => x.id === c.competitionId);
+      return `<tr>
+        <td style="font-weight:600">${esc(c.firstName)}</td>
+        <td style="color:var(--dim);font-size:.85rem">${esc(c.username)}</td>
+        <td style="font-size:.82rem;color:var(--dim)">${comp ? esc(comp.name) : c.competitionId}</td>
+        <td>${c.referralCode ? `<span class="pill pill-code">${esc(c.referralCode)}</span>` : '<span class="pill pill-none">Not set</span>'}</td>
+        <td class="pts">${c.points}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteCompetitor('${esc(c.username)}')">Remove</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+async function deleteCompetitor(username) {
+  if (!confirm('Remove competitor ' + username + '?')) return;
+  const r = await fetch('/comp-owner/api/competitors/' + encodeURIComponent(username), { method: 'DELETE' });
+  const d = await r.json();
+  if (d.success) { toast('Removed'); loadCompetitors(); }
+  else toast(d.message || 'Failed', true);
+}
+
+async function loadLeaderboard() {
+  const compId = document.getElementById('lbComp').value;
+  const comp = competitions.find(c => c.id === compId);
+  const ended = comp?.ended || false;
+  const minPts = comp?.minPoints != null ? comp.minPoints : 10;
+  const url = '/comp-owner/api/leaderboard' + (compId ? '?competitionId=' + encodeURIComponent(compId) : '');
+  const r = await fetch(url);
+  if (!r.ok) return;
+  const list = await r.json();
+  const el = document.getElementById('lbTable');
+  if (!list.length) { el.innerHTML = '<div class="empty">No competitors yet.</div>'; return; }
+
+  const headerExtra = ended ? '<th>Result</th>' : '';
+  el.innerHTML = `
+    ${ended ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#fca5a5;font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:14px">
+      🏁 Competition ended — min. <strong>${minPts} points</strong> required to qualify
+    </div>` : ''}
+    <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Competitor</th><th>Username</th><th>Code</th><th>Points</th>${headerExtra}</tr></thead>
+    <tbody>${list.map(c => {
+      const pts = c.points;
+      const isElim = ended && pts < minPts;
+      const isPassed = ended && pts >= minPts;
+      const resultCell = ended
+        ? `<td>${isPassed ? '<span class="pill pill-pass">✅ Qualified</span>' : '<span class="pill pill-elim">❌ Eliminated</span>'}</td>`
+        : '';
+      return `<tr>
+        <td class="${c.rank <= 3 ? 'rank1' : ''}">${c.rank === 1 ? '🥇' : c.rank === 2 ? '🥈' : c.rank === 3 ? '🥉' : c.rank}</td>
+        <td style="font-weight:600;${isElim ? 'opacity:.55' : ''}">${esc(c.firstName)}</td>
+        <td style="color:var(--dim);font-size:.85rem">${esc(c.username)}</td>
+        <td>${c.referralCode ? `<span class="pill pill-code">${esc(c.referralCode)}</span>` : '<span class="pill pill-none">—</span>'}</td>
+        <td class="${isElim ? 'pts-low' : 'pts'}">${pts}</td>
+        ${resultCell}
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+async function init() {
+  await loadCompetitions();
+  setInterval(loadLeaderboard, 30000);
+}
+init();
+</script>
+</body>
+</html>

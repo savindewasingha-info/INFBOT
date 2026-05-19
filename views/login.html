@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity MD Mini — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#04040c;--surface:rgba(255,255,255,0.04);--surface-2:rgba(255,255,255,0.07);
+      --border:rgba(255,255,255,0.08);--border-focus:rgba(139,92,246,0.6);
+      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.15);
+      --cyan:#06b6d4;--cyan-dim:rgba(6,182,212,0.15);
+      --green:#10b981;--text:#f1f5f9;--dim:rgba(255,255,255,0.4);
+    }
+    html,body{height:100%}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+    /* ── Background ── */
+    .bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .bg-layer::before{
+      content:'';position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 0%,rgba(139,92,246,0.18),transparent 60%),
+        radial-gradient(ellipse 55% 55% at 85% 100%,rgba(6,182,212,0.12),transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%,rgba(139,92,246,0.05),transparent 60%);
+    }
+    .grid-bg{
+      position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:linear-gradient(rgba(139,92,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.04) 1px,transparent 1px);
+      background-size:48px 48px;
+    }
+
+    /* ── Orbs ── */
+    .orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(80px);z-index:0}
+    .orb1{width:400px;height:400px;top:-150px;left:-100px;background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%)}
+    .orb2{width:350px;height:350px;bottom:-120px;right:-100px;background:radial-gradient(circle,rgba(6,182,212,0.12),transparent 70%)}
+
+    /* ── Layout ── */
+    .page{
+      position:relative;z-index:1;width:100%;
+      display:flex;align-items:center;justify-content:center;
+      min-height:100vh;padding:24px;
+    }
+
+    /* ── Card ── */
+    .auth-card{
+      width:100%;max-width:420px;
+      background:rgba(10,10,20,0.85);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:40px 36px;
+      backdrop-filter:blur(32px);
+      -webkit-backdrop-filter:blur(32px);
+      box-shadow:0 40px 80px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);
+      position:relative;
+    }
+    .auth-card::before{
+      content:'';position:absolute;inset:-1px;border-radius:25px;
+      background:linear-gradient(135deg,rgba(139,92,246,0.3),transparent 40%,transparent 60%,rgba(6,182,212,0.15));
+      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      padding:1px;pointer-events:none;
+    }
+
+    /* ── Logo ── */
+    .logo-area{text-align:center;margin-bottom:32px}
+    .logo-icon{
+      width:64px;height:64px;border-radius:18px;margin:0 auto 14px;
+      background:linear-gradient(135deg,#7c3aed,#06b6d4);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.7rem;
+      box-shadow:0 0 0 8px rgba(124,58,237,0.08),0 20px 40px rgba(124,58,237,0.3);
+      animation:pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow{
+      0%,100%{box-shadow:0 0 0 8px rgba(124,58,237,0.08),0 20px 40px rgba(124,58,237,0.3)}
+      50%{box-shadow:0 0 0 12px rgba(124,58,237,0.12),0 24px 48px rgba(124,58,237,0.45)}
+    }
+    .logo-title{
+      font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;letter-spacing:3px;
+      background:linear-gradient(135deg,#c4b5fd,#fff 50%,#67e8f9);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .logo-sub{color:var(--dim);font-size:0.78rem;margin-top:5px;letter-spacing:0.3px}
+
+    /* ── Form heading ── */
+    .form-heading{margin-bottom:24px}
+    .form-title{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:4px}
+    .form-subtitle{font-size:0.8rem;color:var(--dim)}
+
+    /* ── Inputs ── */
+    .field{margin-bottom:16px}
+    .field label{
+      display:block;font-size:0.7rem;font-weight:600;
+      color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;
+    }
+    .field-wrap{position:relative}
+    .field-icon{
+      position:absolute;left:14px;top:50%;transform:translateY(-50%);
+      font-size:0.9rem;opacity:0.45;pointer-events:none;
+    }
+    .field input{
+      width:100%;padding:13px 14px 13px 40px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--border);
+      border-radius:12px;color:var(--text);font-size:0.9rem;font-family:inherit;
+      transition:all 0.25s;outline:none;
+    }
+    .field input::placeholder{color:rgba(255,255,255,0.2)}
+    .field input:focus{
+      border-color:var(--purple);
+      background:rgba(139,92,246,0.08);
+      box-shadow:0 0 0 3px rgba(139,92,246,0.15);
+    }
+
+    /* ── Error ── */
+    .error-box{
+      display:none;margin-bottom:16px;padding:10px 14px;
+      background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
+      border-radius:10px;color:#fca5a5;font-size:0.8rem;
+    }
+
+    /* ── Button ── */
+    .btn-submit{
+      width:100%;padding:14px;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#7c3aed,#5b21b6);
+      color:#fff;font-size:0.95rem;font-weight:700;font-family:inherit;
+      cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;
+      box-shadow:0 4px 20px rgba(124,58,237,0.35);
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-submit::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent);
+      opacity:0;transition:opacity 0.25s;
+    }
+    .btn-submit:hover::after{opacity:1}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,0.5)}
+    .btn-submit:active{transform:translateY(0)}
+    .btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .spinner{
+      width:18px;height:18px;display:none;
+      border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;
+      border-radius:50%;animation:spin 0.6s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Footer link ── */
+    .footer-link{text-align:center;margin-top:20px;font-size:0.82rem;color:var(--dim)}
+    .footer-link a{color:var(--purple);text-decoration:none;font-weight:600;transition:color 0.2s}
+    .footer-link a:hover{color:#a78bfa}
+
+    /* ── Powered ── */
+    .powered{
+      text-align:center;margin-top:28px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .powered-label{color:rgba(255,255,255,0.2);font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px}
+    .powered-name{
+      font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:900;
+      background:linear-gradient(135deg,#fbbf24,#f97316,#a855f7);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:glow-name 2.5s ease-in-out infinite alternate;
+    }
+    @keyframes glow-name{
+      from{filter:drop-shadow(0 0 4px rgba(245,158,11,0.3))}
+      to{filter:drop-shadow(0 0 10px rgba(245,158,11,0.7))}
+    }
+    .star-spin{animation:star-rot 5s linear infinite;display:inline-block;font-size:0.85rem;color:rgba(245,158,11,0.6)}
+    @keyframes star-rot{to{transform:rotate(360deg)}}
+
+    /* ── Rainbow progress bar ── */
+    .progress-wrap{
+      height:5px;border-radius:99px;overflow:hidden;margin-top:14px;
+      background:rgba(255,255,255,0.06);
+      opacity:0;transition:opacity 0.25s;
+    }
+    .progress-wrap.visible{opacity:1}
+    .progress-bar{
+      height:100%;width:0%;border-radius:99px;
+      background:linear-gradient(90deg,
+        #f43f5e,#f97316,#facc15,#22c55e,#06b6d4,#6366f1,#a855f7,#f43f5e,
+        #f97316,#facc15,#22c55e,#06b6d4,#6366f1,#a855f7);
+      background-size:200% 100%;
+      animation:rainbow-slide 1.4s linear infinite;
+      transition:width 0.12s linear;
+      box-shadow:0 0 8px 1px rgba(168,85,247,0.5);
+    }
+    @keyframes rainbow-slide{
+      0%{background-position:0% 50%}
+      100%{background-position:200% 50%}
+    }
+
+    @media(max-width:480px){
+      .page{padding:16px;align-items:flex-start;padding-top:28px}
+      .auth-card{padding:28px 22px;border-radius:18px}
+      .logo-title{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="page">
+    <div>
+      <div class="auth-card">
+        <div class="logo-area">
+          <div class="logo-icon">♾️</div>
+          <div class="logo-title">INFINITY MD MINI</div>
+          <div class="logo-sub">WhatsApp Bot — Mini Edition</div>
+        </div>
+
+        <div class="form-heading">
+          <div class="form-title">Welcome back</div>
+          <div class="form-subtitle">Sign in to access your bot dashboard</div>
+        </div>
+
+        <div class="error-box" id="errorMsg"></div>
+
+        <div class="field">
+          <label>Username</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" id="username" placeholder="Enter your username" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+          </div>
+        </div>
+
+        <button class="btn-submit" id="loginBtn" onclick="login()">
+          <span id="btnText">Sign In</span>
+          <div class="spinner" id="btnSpinner"></div>
+        </button>
+
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <p class="footer-link">Don't have an account? <a href="/signup">Create one free</a></p>
+      </div>
+
+      <div class="powered">
+        <span class="star-spin">✦</span>
+        <span class="powered-label">Powered by</span>
+        <span class="powered-name">INFINITY MD MINI</span>
+        <span class="star-spin" style="animation-direction:reverse">✦</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('username').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('password').focus()});
+    document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+
+    /* ── Rainbow progress bar controller ── */
+    let _progTimer=null, _progRaf=null;
+    function startProgress(){
+      const wrap=document.getElementById('progressWrap');
+      const bar=document.getElementById('progressBar');
+      // Reset
+      bar.style.transition='none';
+      bar.style.width='0%';
+      wrap.classList.add('visible');
+      // Force reflow so transition reset takes effect
+      bar.getBoundingClientRect();
+      // Animate to 92% over 15 s (holds just short of 100 until we know the result)
+      bar.style.transition='width 15s cubic-bezier(0.25,0.1,0.25,1)';
+      bar.style.width='92%';
+    }
+    function finishProgress(success){
+      const wrap=document.getElementById('progressWrap');
+      const bar=document.getElementById('progressBar');
+      if(success){
+        bar.style.transition='width 0.3s ease';
+        bar.style.width='100%';
+        // fade out after redirect
+        setTimeout(()=>{ wrap.classList.remove('visible'); },1200);
+      } else {
+        // Collapse quickly on failure
+        bar.style.transition='width 0.3s ease,opacity 0.3s ease';
+        bar.style.width='0%';
+        setTimeout(()=>{ wrap.classList.remove('visible'); },350);
+      }
+    }
+
+    async function login(){
+      const btn=document.getElementById('loginBtn');
+      const errEl=document.getElementById('errorMsg');
+      const u=document.getElementById('username').value.trim();
+      const p=document.getElementById('password').value;
+      errEl.style.display='none';
+      if(!u||!p){errEl.textContent='Please fill in all fields';errEl.style.display='block';return}
+      btn.disabled=true;
+      document.getElementById('btnText').textContent='Signing in…';
+      document.getElementById('btnSpinner').style.display='block';
+      startProgress();
+      let redirecting=false;
+      try{
+        const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({username:u,password:p})});
+        const data=await res.json();
+        if(data.success){
+          redirecting=true;
+          document.getElementById('btnText').textContent='Redirecting…';
+          finishProgress(true);
+          // Small delay so the browser can commit the session cookie before the next request
+          setTimeout(()=>{ window.location.replace('/dashboard'); }, 120);
+        }else{
+          finishProgress(false);
+          errEl.textContent=data.message||'Invalid username or password';
+          errEl.style.display='block';
+        }
+      }catch(e){
+        finishProgress(false);
+        errEl.textContent='Connection error. Please try again.';
+        errEl.style.display='block';
+      }
+      finally{
+        if(!redirecting){
+          btn.disabled=false;
+          document.getElementById('btnText').textContent='Sign In';
+          document.getElementById('btnSpinner').style.display='none';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

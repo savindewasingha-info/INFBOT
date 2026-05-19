@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity MD Mini — Create Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#04040c;--surface:rgba(255,255,255,0.04);
+      --border:rgba(255,255,255,0.08);
+      --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.15);
+      --cyan:#06b6d4;--green:#10b981;
+      --text:#f1f5f9;--dim:rgba(255,255,255,0.4);
+    }
+    html,body{height:100%}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+    .bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .bg-layer::before{
+      content:'';position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 70% 60% at 85% 0%,rgba(6,182,212,0.15),transparent 60%),
+        radial-gradient(ellipse 55% 55% at 15% 100%,rgba(139,92,246,0.12),transparent 60%),
+        radial-gradient(ellipse 35% 35% at 50% 50%,rgba(16,185,129,0.04),transparent 60%);
+    }
+    .grid-bg{
+      position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:linear-gradient(rgba(6,182,212,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,0.04) 1px,transparent 1px);
+      background-size:48px 48px;
+    }
+    .orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(80px);z-index:0}
+    .orb1{width:400px;height:400px;top:-150px;right:-100px;background:radial-gradient(circle,rgba(6,182,212,0.12),transparent 70%)}
+    .orb2{width:350px;height:350px;bottom:-120px;left:-100px;background:radial-gradient(circle,rgba(139,92,246,0.12),transparent 70%)}
+
+    .page{
+      position:relative;z-index:1;width:100%;
+      display:flex;align-items:center;justify-content:center;
+      min-height:100vh;padding:24px;
+    }
+
+    .auth-card{
+      width:100%;max-width:420px;
+      background:rgba(10,10,20,0.85);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:40px 36px;
+      backdrop-filter:blur(32px);
+      -webkit-backdrop-filter:blur(32px);
+      box-shadow:0 40px 80px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);
+      position:relative;
+    }
+    .auth-card::before{
+      content:'';position:absolute;inset:-1px;border-radius:25px;
+      background:linear-gradient(135deg,rgba(6,182,212,0.3),transparent 40%,transparent 60%,rgba(139,92,246,0.15));
+      -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      padding:1px;pointer-events:none;
+    }
+
+    .logo-area{text-align:center;margin-bottom:28px}
+    .logo-icon{
+      width:64px;height:64px;border-radius:18px;margin:0 auto 14px;
+      background:linear-gradient(135deg,#06b6d4,#8b5cf6);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.7rem;
+      box-shadow:0 0 0 8px rgba(6,182,212,0.08),0 20px 40px rgba(6,182,212,0.25);
+      animation:pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow{
+      0%,100%{box-shadow:0 0 0 8px rgba(6,182,212,0.08),0 20px 40px rgba(6,182,212,0.25)}
+      50%{box-shadow:0 0 0 12px rgba(6,182,212,0.12),0 24px 48px rgba(6,182,212,0.4)}
+    }
+    .logo-title{
+      font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;letter-spacing:3px;
+      background:linear-gradient(135deg,#67e8f9,#fff 50%,#c4b5fd);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .logo-sub{color:var(--dim);font-size:0.78rem;margin-top:5px;letter-spacing:0.3px}
+
+    .form-heading{margin-bottom:24px}
+    .form-title{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:4px}
+    .form-subtitle{font-size:0.8rem;color:var(--dim)}
+
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:0.7rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+    .field-wrap{position:relative}
+    .field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:0.9rem;opacity:0.45;pointer-events:none}
+    .field input{
+      width:100%;padding:13px 14px 13px 40px;
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--border);
+      border-radius:12px;color:var(--text);font-size:0.9rem;font-family:inherit;
+      transition:all 0.25s;outline:none;
+    }
+    .field input::placeholder{color:rgba(255,255,255,0.2)}
+    .field input:focus{
+      border-color:var(--cyan);
+      background:rgba(6,182,212,0.07);
+      box-shadow:0 0 0 3px rgba(6,182,212,0.12);
+    }
+
+    /* Strength bar */
+    .strength-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:8px;overflow:hidden}
+    .strength-fill{height:100%;border-radius:2px;transition:width 0.35s,background 0.35s;width:0}
+
+    .msg{
+      display:none;margin-bottom:16px;padding:10px 14px;border-radius:10px;font-size:0.8rem;
+    }
+    .msg.error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#fca5a5}
+    .msg.success{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7}
+
+    .btn-submit{
+      width:100%;padding:14px;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#06b6d4,#8b5cf6);
+      color:#fff;font-size:0.95rem;font-weight:700;font-family:inherit;
+      cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;
+      box-shadow:0 4px 20px rgba(6,182,212,0.3);
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-submit::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent);
+      opacity:0;transition:opacity 0.25s;
+    }
+    .btn-submit:hover::after{opacity:1}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(6,182,212,0.45)}
+    .btn-submit:active{transform:translateY(0)}
+    .btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .spinner{width:18px;height:18px;display:none;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .footer-link{text-align:center;margin-top:20px;font-size:0.82rem;color:var(--dim)}
+    .footer-link a{color:var(--cyan);text-decoration:none;font-weight:600;transition:color 0.2s}
+    .footer-link a:hover{color:#67e8f9}
+
+    .powered{
+      text-align:center;margin-top:28px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .powered-label{color:rgba(255,255,255,0.2);font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px}
+    .powered-name{
+      font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:900;
+      background:linear-gradient(135deg,#fbbf24,#f97316,#a855f7);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:glow-name 2.5s ease-in-out infinite alternate;
+    }
+    @keyframes glow-name{
+      from{filter:drop-shadow(0 0 4px rgba(245,158,11,0.3))}
+      to{filter:drop-shadow(0 0 10px rgba(245,158,11,0.7))}
+    }
+    .star-spin{animation:star-rot 5s linear infinite;display:inline-block;font-size:0.85rem;color:rgba(245,158,11,0.6)}
+    @keyframes star-rot{to{transform:rotate(360deg)}}
+
+    @media(max-width:480px){
+      .page{padding:16px;align-items:flex-start;padding-top:24px}
+      .auth-card{padding:28px 22px;border-radius:18px}
+      .logo-title{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="page">
+    <div>
+      <div class="auth-card">
+        <div class="logo-area">
+          <div class="logo-icon">♾️</div>
+          <div class="logo-title">INFINITY MD MINI</div>
+          <div class="logo-sub">WhatsApp Bot — Mini Edition</div>
+        </div>
+
+        <div class="form-heading">
+          <div class="form-title">Create your account</div>
+          <div class="form-subtitle">Get your bot control panel set up in seconds</div>
+        </div>
+
+        <div class="msg" id="msgEl"></div>
+
+        <div class="field">
+          <label>Username</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password" oninput="checkStrength(this.value)">
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthBar"></div></div>
+        </div>
+
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">✅</span>
+            <input type="password" id="confirmPassword" placeholder="Repeat your password" autocomplete="new-password">
+          </div>
+        </div>
+
+        <button class="btn-submit" id="signupBtn" onclick="signup()">
+          <span id="btnText">Create Account</span>
+          <div class="spinner" id="btnSpinner"></div>
+        </button>
+
+        <p class="footer-link">Already have an account? <a href="/login">Sign in</a></p>
+      </div>
+
+      <div class="powered">
+        <span class="star-spin">✦</span>
+        <span class="powered-label">Powered by</span>
+        <span class="powered-name">INFINITY MD MINI</span>
+        <span class="star-spin" style="animation-direction:reverse">✦</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('confirmPassword').addEventListener('keydown',e=>{if(e.key==='Enter')signup()});
+    document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('confirmPassword').focus()});
+
+    function checkStrength(pw){
+      const bar=document.getElementById('strengthBar');
+      let s=0;
+      if(pw.length>=6)s++;if(pw.length>=10)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^a-zA-Z0-9]/.test(pw))s++;
+      const pct=[0,20,40,60,80,100][s];
+      const col=['#ef4444','#ef4444','#f59e0b','#f59e0b','#10b981','#10b981'][s];
+      bar.style.width=pct+'%';bar.style.background=col;
+    }
+
+    function showMsg(text,type){
+      const el=document.getElementById('msgEl');
+      el.textContent=text;el.className='msg '+type;el.style.display='block';
+    }
+
+    async function signup(){
+      const btn=document.getElementById('signupBtn');
+      const u=document.getElementById('username').value.trim();
+      const p=document.getElementById('password').value;
+      const cp=document.getElementById('confirmPassword').value;
+      document.getElementById('msgEl').style.display='none';
+      if(!u||!p){showMsg('Please fill in all fields','error');return}
+      if(u.length<3){showMsg('Username must be at least 3 characters','error');return}
+      if(p.length<4){showMsg('Password must be at least 4 characters','error');return}
+      if(p!==cp){showMsg('Passwords do not match','error');return}
+      btn.disabled=true;
+      document.getElementById('btnText').textContent='Creating account…';
+      document.getElementById('btnSpinner').style.display='block';
+      try{
+        const res=await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({username:u,password:p})});
+        const data=await res.json();
+        if(data.success){
+          showMsg('Account created! Redirecting to login…','success');
+          setTimeout(()=>window.location.href='/login',1500);
+        }else{
+          showMsg(data.message||'Signup failed. Username may already exist.','error');
+        }
+      }catch(e){showMsg('Connection error. Please try again.','error')}
+      finally{
+        btn.disabled=false;
+        document.getElementById('btnText').textContent='Create Account';
+        document.getElementById('btnSpinner').style.display='none';
+      }
+    }
+  </script>
+</body>
+</html>

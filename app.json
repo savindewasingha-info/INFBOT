@@ -1,0 +1,25 @@
+{
+  "name": "Infinity MD",
+  "description": "Infinity MD - Powerful WhatsApp Multi-Device Bot built with Baileys",
+  "repository": "https://github.com/YOUR_GITHUB/INFINITY-MD",
+  "keywords": [
+    "whatsapp",
+    "baileys",
+    "bot",
+    "nodejs",
+    "infinity-md",
+    "whatsapp-bot"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+    }
+  ],
+  "env": {
+    "SESSION_ID": {
+      "description": "Infinity MD session string (example: InfinityMD!<base64_session>)",
+      "required": false,
+      "value": ""
+    }
+  }
+}

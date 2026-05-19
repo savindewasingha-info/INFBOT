@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinity MD · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#030712;
+  --surface:#0c111d;
+  --surface2:#111827;
+  --glass:rgba(255,255,255,0.035);
+  --glass-h:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.07);
+  --border-h:rgba(255,255,255,0.13);
+  --accent:#7c3aed;--accent2:#6d28d9;
+  --blue:#2563eb;--blue2:#3b82f6;--blue3:#60a5fa;
+  --cyan:#0891b2;--cyan2:#06b6d4;
+  --green:#059669;--green2:#10b981;--green3:#34d399;
+  --red:#dc2626;--red2:#ef4444;
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fbbf24;
+  --pink:#db2777;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --sidebar-w:252px;
+  --r:14px;--r-sm:9px;--r-lg:18px;
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+::selection{background:rgba(124,58,237,.35);color:var(--text)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── Ambient background ── */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb-orb{position:absolute;border-radius:50%;filter:blur(100px);will-change:transform;animation:ambFloat 12s ease-in-out infinite}
+.amb-orb:nth-child(1){width:600px;height:600px;background:radial-gradient(circle,rgba(109,40,217,.14),transparent 65%);top:-200px;left:-150px;animation-delay:0s}
+.amb-orb:nth-child(2){width:500px;height:500px;background:radial-gradient(circle,rgba(37,99,235,.1),transparent 65%);bottom:-150px;right:-100px;animation-delay:-5s}
+.amb-orb:nth-child(3){width:400px;height:400px;background:radial-gradient(circle,rgba(8,145,178,.08),transparent 65%);top:40%;left:40%;animation-delay:-9s}
+@keyframes ambFloat{0%,100%{transform:translate(0,0)}40%{transform:translate(25px,-35px)}70%{transform:translate(-18px,22px)}}
+.dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent)}
+
+/* ── Layout ── */
+.layout{display:flex;height:100vh}
+
+/* ── Sidebar ── */
+.sidebar{
+  width:var(--sidebar-w);position:fixed;top:0;left:0;bottom:0;z-index:200;
+  background:rgba(3,7,18,.82);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transition:transform .28s cubic-bezier(.4,0,.2,1)
+}
+
+/* Logo */
+.sb-brand{padding:22px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--border)}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--blue2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 1px rgba(139,92,246,.3),0 4px 16px rgba(109,40,217,.35)
+}
+.brand-mark svg{width:20px;height:20px;stroke:#fff;stroke-width:2;fill:none}
+.brand-copy{}
+.brand-name{font-family:'Space Grotesk',sans-serif;font-size:.92rem;font-weight:700;line-height:1;color:var(--text);letter-spacing:-.01em}
+.brand-sub{font-size:.6rem;color:var(--text3);margin-top:3px;letter-spacing:.03em}
+.brand-chip{display:inline-flex;align-items:center;padding:1px 5px;border-radius:4px;font-size:.5rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,var(--accent),var(--blue2));color:#fff;margin-left:5px;vertical-align:middle}
+
+/* User card */
+.sb-user{margin:12px 10px 4px;padding:11px 12px;border-radius:10px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.u-av{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#0891b2)}
+.u-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.u-role{font-size:.63rem;color:var(--text3);margin-top:2px}
+
+/* Nav */
+.sb-nav{flex:1;padding:8px 10px 6px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
+.nav-group-label{font-size:.58rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;padding:10px 8px 5px;margin-top:4px}
+.ni{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:9px;cursor:pointer;
+  font-size:.82rem;font-weight:500;color:var(--text2);
+  transition:background .12s,color .12s;
+  position:relative;user-select:none
+}
+.ni:hover{background:var(--glass-h);color:var(--text)}
+.ni.active{background:linear-gradient(90deg,rgba(124,58,237,.18),rgba(37,99,235,.08));color:var(--text)}
+.ni.active::after{content:'';position:absolute;left:-10px;top:25%;bottom:25%;width:2.5px;border-radius:0 2px 2px 0;background:linear-gradient(to bottom,var(--accent),var(--blue2))}
+.ni-ic{width:17px;height:17px;flex-shrink:0;opacity:.7}
+.ni.active .ni-ic{opacity:1}
+.ni:hover .ni-ic{opacity:.9}
+.ni-badge{margin-left:auto;font-size:.58rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--blue2));color:#fff;padding:2px 7px;border-radius:20px;min-width:18px;text-align:center;line-height:1.6}
+
+/* Sidebar footer */
+.sb-foot{padding:8px 10px 14px;border-top:1px solid var(--border)}
+
+/* Overlay */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190}
+.sb-overlay.show{display:block}
+
+/* ── Main content ── */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── Topbar ── */
+.topbar{
+  height:58px;flex-shrink:0;
+  background:rgba(3,7,18,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 22px;gap:12px
+}
+.tb-menu{display:none;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);padding:6px 8px;cursor:pointer;line-height:1;transition:all .15s}
+.tb-menu:hover{border-color:var(--border-h);color:var(--text)}
+.tb-menu svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+.tb-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;flex:1;letter-spacing:-.01em}
+.tb-right{display:flex;align-items:center;gap:8px}
+.live-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.16);font-size:.7rem;font-weight:600;color:var(--green3);letter-spacing:.02em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green2);box-shadow:0 0 6px var(--green2);animation:livePulse 2s infinite}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1px solid var(--border);background:var(--glass);color:var(--text2);font-size:.73rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .15s}
+.tb-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--glass-h)}
+.tb-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* ── Scroll container ── */
+.scroller{flex:1;overflow-y:auto;overflow-x:hidden;padding:26px 24px 48px}
+.inner{max-width:1020px;margin:0 auto;width:100%}
+.page{display:none;animation:pgIn .2s ease forwards}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Page header ── */
+.pg-hdr{margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.pg-title{font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.pg-title span{background:linear-gradient(135deg,#fff 30%,rgba(255,255,255,.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pg-sub{font-size:.8rem;color:var(--text3);margin-top:4px;font-weight:400}
+
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.s-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 18px 16px;position:relative;overflow:hidden;
+  transition:border-color .18s,transform .18s;cursor:default
+}
+.s-card:hover{border-color:var(--border-h);transform:translateY(-2px)}
+.s-card-glow{position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:50%;filter:blur(30px);pointer-events:none;opacity:.5}
+.s-card-glow.violet{background:var(--accent)}
+.s-card-glow.green{background:var(--green2)}
+.s-card-glow.blue{background:var(--blue2)}
+.s-card-glow.amber{background:var(--amber2)}
+.s-ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;flex-shrink:0}
+.s-ic svg{width:18px;height:18px;stroke-width:1.75;fill:none}
+.s-ic.violet{background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.2)}
+.s-ic.violet svg{stroke:var(--accent)}
+.s-ic.green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2)}
+.s-ic.green svg{stroke:var(--green2)}
+.s-ic.blue{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)}
+.s-ic.blue svg{stroke:var(--blue3)}
+.s-ic.amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2)}
+.s-ic.amber svg{stroke:var(--amber2)}
+.s-num{font-family:'Space Grotesk',sans-serif;font-size:1.85rem;font-weight:800;line-height:1;letter-spacing:-.02em;margin-bottom:4px}
+.s-num.green{color:var(--green3)}
+.s-num.muted{color:var(--text3)}
+.s-lbl{font-size:.66rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+
+/* ── Section divider ── */
+.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-title{font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:700;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.sec-line{flex:1;height:1px;background:var(--border)}
+
+/* ── Session cards ── */
+.bots-list{display:flex;flex-direction:column;gap:8px}
+.bot-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:var(--r);
+  padding:15px 18px;display:flex;align-items:center;gap:14px;
+  transition:border-color .18s,background .18s;cursor:default
+}
+.bot-card:hover{border-color:var(--border-h);background:var(--glass-h)}
+.bot-card.is-online{border-left:2px solid var(--green2)}
+.bot-card.is-paused{border-left:2px solid var(--amber2)}
+.bot-av-wrap{position:relative;flex-shrink:0}
+.bot-av{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:800;color:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.3)
+}
+.bot-dot{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);background:var(--text3)}
+.bot-dot.online{background:var(--green2);box-shadow:0 0 6px var(--green2)}
+.bot-dot.paused{background:var(--amber2);box-shadow:0 0 6px var(--amber2)}
+.bot-info{flex:1;min-width:0}
+.bot-name{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;color:var(--text)}
+.bot-meta{font-size:.71rem;color:var(--text3);display:flex;align-items:center;gap:6px}
+.bot-meta-sep{width:2px;height:2px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.bot-status{
+  flex-shrink:0;display:inline-flex;align-items:center;gap:5px;
+  font-size:.65rem;font-weight:700;padding:4px 9px;border-radius:6px;
+  text-transform:uppercase;letter-spacing:.05em
+}
+.bot-status.online{background:rgba(16,185,129,.1);color:var(--green3);border:1px solid rgba(16,185,129,.18)}
+.bot-status.offline{background:rgba(71,85,105,.1);color:var(--text3);border:1px solid var(--border)}
+.bot-status.paused{background:rgba(245,158,11,.1);color:var(--amber3);border:1px solid rgba(245,158,11,.18)}
+.bot-status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.bot-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:8px 16px;border-radius:8px;border:1px solid var(--border);
+  background:var(--glass);color:var(--text2);
+  cursor:pointer;font-weight:600;font-size:.78rem;font-family:inherit;
+  transition:all .15s;white-space:nowrap;user-select:none;line-height:1
+}
+.btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.btn:hover{border-color:var(--border-h);color:var(--text);background:var(--glass-h);transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-prim{background:linear-gradient(135deg,var(--accent),var(--blue2));border:none;color:#fff;box-shadow:0 3px 14px rgba(109,40,217,.28)}
+.btn-prim:hover{box-shadow:0 5px 22px rgba(109,40,217,.42);background:linear-gradient(135deg,#8b5cf6,#4f8ef7)}
+.btn-del{background:linear-gradient(135deg,var(--red),#b91c1c);border:none;color:#fff;box-shadow:0 3px 10px rgba(220,38,38,.18)}
+.btn-del:hover{box-shadow:0 5px 16px rgba(220,38,38,.3)}
+.btn-ghost-warn{border-color:rgba(245,158,11,.3);color:var(--amber3)}
+.btn-ghost-warn:hover{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.5)}
+.btn-sm{padding:5px 11px;font-size:.72rem;border-radius:7px}
+.btn-full{width:100%;padding:11px 18px;font-size:.85rem}
+
+/* ── Segment tabs ── */
+.seg{display:flex;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px}
+.seg-btn{flex:1;padding:8px;border:none;background:transparent;color:var(--text3);font-size:.8rem;font-weight:600;font-family:inherit;cursor:pointer;border-radius:7px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.seg-btn.active{background:linear-gradient(135deg,var(--accent),var(--blue2));color:#fff;box-shadow:0 3px 12px rgba(109,40,217,.3)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:pgIn .18s ease}
+
+/* ── Cards ── */
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);pointer-events:none}
+.c-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.c-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.c-ic svg{width:17px;height:17px;stroke-width:1.75;fill:none}
+.c-ic.violet{background:rgba(124,58,237,.13);border:1px solid rgba(124,58,237,.18)}
+.c-ic.violet svg{stroke:var(--accent)}
+.c-ic.blue{background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.18)}
+.c-ic.blue svg{stroke:var(--blue3)}
+.c-ic.green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.18)}
+.c-ic.green svg{stroke:var(--green2)}
+.c-ic.pink{background:rgba(219,39,119,.12);border:1px solid rgba(219,39,119,.18)}
+.c-ic.pink svg{stroke:#f472b6}
+.c-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;color:var(--text);letter-spacing:-.01em}
+.c-sub{font-size:.72rem;color:var(--text3);margin-top:2px}
+
+/* ── Form elements ── */
+.fg{margin-bottom:14px}
+.fl{display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}
+.fl .opt{color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;opacity:.7}
+input[type=text],input[type=password],input[type=number],textarea,select{
+  width:100%;padding:10px 13px;border-radius:8px;
+  border:1px solid var(--border);background:rgba(255,255,255,.03);
+  color:var(--text);font-family:inherit;font-size:.84rem;outline:none;
+  transition:border-color .18s,box-shadow .18s,background .18s
+}
+input:focus,textarea:focus,select:focus{
+  border-color:rgba(124,58,237,.45);
+  box-shadow:0 0 0 3px rgba(124,58,237,.1);
+  background:rgba(255,255,255,.05)
+}
+input::placeholder,textarea::placeholder{color:var(--text3);opacity:.7}
+textarea{resize:vertical;min-height:88px}
+
+/* ── Alert banners ── */
+.alert{padding:12px 14px;border-radius:9px;font-size:.79rem;color:var(--text2);line-height:1.6;margin-bottom:14px;display:flex;align-items:flex-start;gap:9px}
+.alert svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0;margin-top:1px}
+.alert-info{background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.18);color:var(--text2)}
+.alert-info svg{stroke:var(--blue3)}
+.alert-ok{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18)}
+.alert-ok svg{stroke:var(--green3)}
+.alert-warn{background:rgba(217,119,6,.07);border:1px solid rgba(217,119,6,.2)}
+.alert-warn svg{stroke:var(--amber3)}
+.alert-err{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.18)}
+.alert-err svg{stroke:var(--red2)}
+
+/* ── QR & pair code ── */
+.qr-box{text-align:center;padding:28px 20px;border-radius:12px;background:rgba(255,255,255,.02);border:1.5px dashed var(--border-h);min-height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.qr-box img{border-radius:10px;max-width:200px;box-shadow:0 0 36px rgba(109,40,217,.18)}
+.pair-box{background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.18);border-radius:12px;padding:22px;text-align:center}
+.pair-num{font-family:'Space Grotesk',monospace;font-size:2rem;font-weight:800;color:var(--blue3);letter-spacing:9px;text-shadow:0 0 20px rgba(96,165,250,.3);line-height:1}
+.pair-desc{font-size:.76rem;color:var(--text3);margin-top:10px;line-height:1.55}
+
+/* ── Spinner ── */
+.spin{width:32px;height:32px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spinning .65s linear infinite}
+@keyframes spinning{to{transform:rotate(360deg)}}
+
+/* ── Toasts ── */
+#toasts{position:fixed;top:70px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none;width:290px}
+.toast{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;
+  font-size:.78rem;font-weight:500;pointer-events:auto;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 8px 28px rgba(0,0,0,.5);
+  animation:toastIn .22s cubic-bezier(.34,1.56,.64,1)
+}
+.toast svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.toast.success{background:rgba(5,150,105,.88);color:#fff;border:1px solid rgba(52,211,153,.25)}
+.toast.error{background:rgba(185,28,28,.9);color:#fff;border:1px solid rgba(239,68,68,.25)}
+.toast.info{background:rgba(15,23,42,.94);color:var(--text);border:1px solid var(--border-h)}
+.toast.warn{background:rgba(180,83,9,.88);color:#fff;border:1px solid rgba(251,191,36,.25)}
+@keyframes toastIn{from{opacity:0;transform:translateX(26px) scale(.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* ── Empty state ── */
+.empty{padding:52px 20px;text-align:center}
+.empty-ring{width:64px;height:64px;border-radius:18px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.empty-ring svg{width:28px;height:28px;stroke:var(--text3);stroke-width:1.5;fill:none}
+.empty-t{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-s{font-size:.79rem;color:var(--text3);line-height:1.6;margin-bottom:18px}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .tb-menu{display:flex}
+}
+@media(max-width:560px){
+  .scroller{padding:18px 14px 48px}
+  .bot-card{flex-wrap:wrap}
+  .bot-actions{width:100%;justify-content:flex-end;margin-top:4px}
+  .pg-title{font-size:1.2rem}
+  .topbar{padding:0 14px}
+  .stats-row{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="amb-orb"></div>
+  <div class="amb-orb"></div>
+  <div class="amb-orb"></div>
+  <div class="dot-grid"></div>
+</div>
+
+<div id="toasts"></div>
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" id="sidebar">
+
+    <div class="sb-brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3M3 16v3a2 2 0 002 2h3m8 0h3a2 2 0 002-2v-3" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </div>
+      <div class="brand-copy">
+        <div class="brand-name">Infinity MD<span class="brand-chip">Mini</span></div>
+        <div class="brand-sub">WhatsApp Bot Platform</div>
+      </div>
+    </div>
+
+    <div class="sb-user">
+      <div class="u-av" id="userAv">?</div>
+      <div style="min-width:0;flex:1">
+        <div class="u-name" id="userName">Loading…</div>
+        <div class="u-role" id="userRole">Member</div>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="nav-group-label">Workspace</div>
+
+      <div class="ni active" id="nav-sessions" onclick="navTo('sessions')">
+        <svg class="ni-ic" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        My Bots
+        <span class="ni-badge" id="nb-online" style="display:none">0</span>
+      </div>
+
+      <div class="ni" id="nav-connect" onclick="navTo('connect')">
+        <svg class="ni-ic" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M15 7h3a5 5 0 010 10h-3m-6 0H6A5 5 0 016 7h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Connect Bot
+      </div>
+
+      <div class="nav-group-label" id="owner-section" style="display:none">Admin</div>
+      <div class="ni" id="nav-owner" style="display:none" onclick="navTo('owner')">
+        <svg class="ni-ic" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Owner Tools
+      </div>
+    </div>
+
+    <div class="sb-foot">
+      <div style="display:flex;gap:5px;padding:4px 2px 10px;flex-wrap:wrap">
+        <button onclick="dashSetLang('en')" id="dlang-en" style="flex:1;min-width:52px;padding:5px 4px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:rgba(124,58,237,0.18);color:#f1f5f9;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">🇬🇧 EN</button>
+        <button onclick="dashSetLang('si')" id="dlang-si" style="flex:1;min-width:52px;padding:5px 4px;border-radius:7px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">🇱🇰 සිං</button>
+        <button onclick="dashSetLang('pk')" id="dlang-pk" style="flex:1;min-width:52px;padding:5px 4px;border-radius:7px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.04);color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s">🇵🇰 اردو</button>
+      </div>
+      <div class="ni" onclick="logout()" style="color:var(--text3)">
+        <svg class="ni-ic" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <div class="topbar">
+      <button class="tb-menu" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="tb-title" id="topbarTitle">My Bots</div>
+      <div class="tb-right">
+        <div class="live-badge"><span class="live-dot"></span>Live</div>
+        <button class="tb-btn" onclick="refresh()">
+          <svg id="refreshIcon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <div class="scroller">
+      <div class="inner">
+
+        <!-- ══════ SESSIONS ══════ -->
+        <div class="page active" id="page-sessions">
+          <div class="pg-hdr">
+            <div>
+              <div class="pg-title"><span>My Bots</span></div>
+              <div class="pg-sub">All connected WhatsApp sessions</div>
+            </div>
+            <button class="btn btn-prim" onclick="navTo('connect')">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Connect Bot
+            </button>
+          </div>
+
+          <div class="stats-row">
+            <div class="s-card">
+              <div class="s-card-glow violet"></div>
+              <div class="s-ic violet">
+                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="s-num" id="s-total">0</div>
+              <div class="s-lbl">Total Bots</div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-glow green"></div>
+              <div class="s-ic green">
+                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="s-num green" id="s-online">0</div>
+              <div class="s-lbl">Online</div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-glow blue"></div>
+              <div class="s-ic blue">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="s-num muted" id="s-offline">0</div>
+              <div class="s-lbl">Offline</div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-glow amber"></div>
+              <div class="s-ic amber">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="s-num" id="s-uptime" style="font-size:1.1rem;letter-spacing:-.01em">--</div>
+              <div class="s-lbl">Uptime</div>
+            </div>
+          </div>
+
+          <div class="sec-hdr">
+            <div class="sec-title">Sessions</div>
+            <div class="sec-line"></div>
+          </div>
+
+          <div class="bots-list" id="sessionsGrid">
+            <div class="empty">
+              <div class="empty-ring">
+                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+              <div class="empty-t">No bots connected yet</div>
+              <div class="empty-s">Link your WhatsApp number to get started.</div>
+              <button class="btn btn-prim" onclick="navTo('connect')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Connect Your First Bot
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════ CONNECT ══════ -->
+        <div class="page" id="page-connect">
+          <div class="pg-hdr">
+            <div>
+              <div class="pg-title"><span>Connect Bot</span></div>
+              <div class="pg-sub">Link your WhatsApp number to start a new session</div>
+            </div>
+          </div>
+
+          <div class="seg">
+            <button class="seg-btn active" id="tab-btn-pair" onclick="switchTab('pair')">
+              <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              Pair Code
+            </button>
+            <button class="seg-btn" id="tab-btn-qr" onclick="switchTab('qr')">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+              QR Code
+            </button>
+          </div>
+
+          <!-- PAIR CODE TAB -->
+          <div class="tab-panel active" id="tab-pair">
+            <div class="card">
+              <div class="c-hdr">
+                <div class="c-ic violet">
+                  <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </div>
+                <div>
+                  <div class="c-title">Connect via Pair Code</div>
+                  <div class="c-sub">Instant link — no QR scan needed</div>
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Enter your number with country code, no + or spaces — e.g. <strong>94770612011</strong> for Sri Lanka or <strong>447911123456</strong> for UK.</span>
+              </div>
+              <div class="fg">
+                <div class="fl">Bot Name</div>
+                <input type="text" id="p-botname" placeholder="Infinity MD Mini" value="Infinity MD Mini">
+              </div>
+              <div class="fg">
+                <div class="fl">Owner Name</div>
+                <input type="text" id="p-ownername" placeholder="Your Name">
+              </div>
+              <div class="fg">
+                <div class="fl">WhatsApp Number</div>
+                <input type="text" id="p-number" placeholder="94770612011" inputmode="numeric">
+              </div>
+              <div class="fg">
+                <div class="fl">Referral Code <span class="opt">(optional)</span></div>
+                <input type="text" id="p-refcode" placeholder="e.g. john742" autocomplete="off" style="text-transform:lowercase">
+              </div>
+              <button class="btn btn-prim btn-full" onclick="getPairCode()" id="pairBtn">
+                <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Get Pair Code
+              </button>
+            </div>
+
+            <div id="pairResult" style="display:none">
+              <div class="card" style="border-color:rgba(59,130,246,.2)">
+                <div class="c-hdr">
+                  <div class="c-ic blue">
+                    <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                  </div>
+                  <div>
+                    <div class="c-title">Your Pair Code</div>
+                    <div class="c-sub">Enter this in WhatsApp → Linked Devices</div>
+                  </div>
+                </div>
+                <div class="pair-box">
+                  <div class="pair-num" id="pairCodeDisplay">- - - -</div>
+                  <div class="pair-desc">WhatsApp → ⋮ → Linked Devices → Link a Device → Link with phone number</div>
+                </div>
+                <div class="alert alert-ok" style="margin-top:14px;margin-bottom:0">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Bot will auto-connect once you enter the code. Check My Bots in ~30 seconds.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR CODE TAB -->
+          <div class="tab-panel" id="tab-qr">
+            <div class="card">
+              <div class="c-hdr">
+                <div class="c-ic blue">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+                </div>
+                <div>
+                  <div class="c-title">Connect via QR Code</div>
+                  <div class="c-sub">Scan with WhatsApp's camera</div>
+                </div>
+              </div>
+              <div class="alert alert-info">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>Open WhatsApp → Linked Devices → Link a Device, then scan the code below.</span>
+              </div>
+              <div class="fg">
+                <div class="fl">Bot Name</div>
+                <input type="text" id="q-botname" placeholder="Infinity MD Mini" value="Infinity MD Mini">
+              </div>
+              <div class="fg">
+                <div class="fl">Owner Name</div>
+                <input type="text" id="q-ownername" placeholder="Your Name">
+              </div>
+              <div class="fg">
+                <div class="fl">Referral Code <span class="opt">(optional)</span></div>
+                <input type="text" id="q-refcode" placeholder="e.g. john742" autocomplete="off" style="text-transform:lowercase">
+              </div>
+              <button class="btn btn-prim btn-full" onclick="startQR()" id="qrBtn">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+                Generate QR Code
+              </button>
+            </div>
+
+            <div id="qrResult" style="display:none">
+              <div class="card" style="border-color:rgba(59,130,246,.2)">
+                <div class="c-hdr">
+                  <div class="c-ic blue">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+                  </div>
+                  <div>
+                    <div class="c-title">Scan with WhatsApp</div>
+                    <div class="c-sub">Code expires in 60 seconds</div>
+                  </div>
+                </div>
+                <div class="qr-box" id="qrWrap">
+                  <div class="spin"></div>
+                  <p style="font-size:.78rem;color:var(--text3)">Connecting to WhatsApp…</p>
+                </div>
+                <div class="alert alert-ok" style="margin-top:14px;margin-bottom:0">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Bot auto-connects after scanning. Check My Bots in ~10 seconds.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════ OWNER TOOLS ══════ -->
+        <div class="page" id="page-owner">
+          <div class="pg-hdr">
+            <div>
+              <div class="pg-title"><span>Owner Tools</span></div>
+              <div class="pg-sub">Admin controls across all active bots</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="c-hdr">
+              <div class="c-ic violet">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <div>
+                <div class="c-title">Broadcast Message</div>
+                <div class="c-sub">Send from all online bots simultaneously</div>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Leave target blank to message each bot's own owner, or enter a number / group JID to target a specific destination.</span>
+            </div>
+            <div class="fg">
+              <div class="fl">Message</div>
+              <textarea id="bc-message" placeholder="Type your broadcast message…"></textarea>
+            </div>
+            <div class="fg">
+              <div class="fl">Target <span class="opt">(optional)</span></div>
+              <input type="text" id="bc-target" placeholder="Phone number or group JID">
+            </div>
+            <div id="bc-result" style="display:none;margin-bottom:12px"></div>
+            <button class="btn btn-prim btn-full" id="bcBtn" onclick="doBroadcast()">
+              <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              Send Broadcast
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="c-hdr">
+              <div class="c-ic pink">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              </div>
+              <div>
+                <div class="c-title">Channel Post Reaction</div>
+                <div class="c-sub">React with all bots to a channel post</div>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Paste a WhatsApp channel link and all online bots will react to the latest post. Leave Message ID blank to auto-detect.</span>
+            </div>
+            <div class="fg">
+              <div class="fl">Channel Link or JID</div>
+              <input type="text" id="cr-channel" placeholder="https://whatsapp.com/channel/… or ID@newsletter">
+            </div>
+            <div class="fg">
+              <div class="fl">Message ID <span class="opt">(optional)</span></div>
+              <input type="text" id="cr-msgid" placeholder="Leave blank to auto-detect latest post">
+            </div>
+            <div class="fg">
+              <div class="fl">Reaction Emoji</div>
+              <input type="text" id="cr-emoji" value="❤️" style="max-width:110px">
+            </div>
+            <div id="cr-result" style="display:none;margin-bottom:12px"></div>
+            <button class="btn btn-prim btn-full" id="crBtn" onclick="doChannelReact()">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              React with All Bots
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Helpers ── */
+const $ = id => document.getElementById(id);
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ── Toast ── */
+const TICONS = {
+  success:'<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg>',
+  error:'<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  info:'<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
+function toast(msg, type='info', dur=3500){
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML=`${TICONS[type]||''}<span>${esc(msg)}</span>`;
+  $('toasts').appendChild(el);
+  setTimeout(()=>{
+    el.style.transition='all .2s ease';el.style.opacity='0';el.style.transform='translateX(18px)';
+    setTimeout(()=>el.remove(),220);
+  },dur);
+}
+
+/* ── Nav ── */
+let currentPage='sessions';
+function navTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  $('page-'+page).classList.add('active');
+  const ni=$('nav-'+page);if(ni)ni.classList.add('active');
+  const titles={sessions:'My Bots',connect:'Connect Bot',owner:'Owner Tools'};
+  $('topbarTitle').textContent=titles[page]||page;
+  currentPage=page;closeSidebar();
+  if(page==='sessions')loadSessions();
+}
+function toggleSidebar(){$('sidebar').classList.toggle('open');$('sbOverlay').classList.toggle('show')}
+function closeSidebar(){$('sidebar').classList.remove('open');$('sbOverlay').classList.remove('show')}
+
+/* ── Avatar gradient ── */
+const GRADS=[
+  ['#7c3aed','#0891b2'],['#0f766e','#2563eb'],['#be185d','#7c3aed'],
+  ['#c2410c','#d97706'],['#1d4ed8','#059669'],['#6d28d9','#db2777']
+];
+function avatarGrad(name){const i=(name||'').charCodeAt(0)%GRADS.length;return `linear-gradient(135deg,${GRADS[i][0]},${GRADS[i][1]})`}
+
+/* ── Sessions ── */
+async function loadSessions(showErr=true){
+  try{
+    const res=await fetch('/api/sessions',{credentials:'include'});
+    if(res.redirected||res.status===401||res.status===403){window.location.href='/login';return}
+    if(!res.ok){if(showErr)toast('Failed to load bots','error');return}
+    const data=await res.json();
+    if(!Array.isArray(data)){if(showErr)toast('Failed to load bots','error');return}
+    renderSessions(data);
+  }catch(e){if(showErr)toast('Failed to load bots','error')}
+}
+
+function renderSessions(sessions){
+  const online=sessions.filter(s=>s.status==='Online').length;
+  const paused=sessions.filter(s=>s.status==='Paused').length;
+  $('s-total').textContent=sessions.length;
+  $('s-online').textContent=online;
+  $('s-offline').textContent=sessions.length-online;
+  const up=Math.floor(performance.now()/1000);
+  $('s-uptime').textContent=Math.floor(up/3600)+'h '+Math.floor((up%3600)/60)+'m';
+  const nb=$('nb-online');
+  if(online>0){nb.textContent=online;nb.style.display=''}else{nb.style.display='none'}
+
+  const grid=$('sessionsGrid');
+  if(!sessions.length){
+    grid.innerHTML=`<div class="empty">
+      <div class="empty-ring"><svg viewBox="0 0 24 24" stroke="var(--text3)" stroke-width="1.5" fill="none"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <div class="empty-t">No bots connected yet</div>
+      <div class="empty-s">Link your WhatsApp number to get started.</div>
+      <button class="btn btn-prim" onclick="navTo('connect')">
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Connect Your First Bot
+      </button>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML=sessions.map(s=>{
+    const isOn=s.status==='Online',isPaused=s.status==='Paused';
+    const cardCls=isOn?'is-online':isPaused?'is-paused':'';
+    const dotCls=isOn?'online':isPaused?'paused':'';
+    const badgeCls=isOn?'online':isPaused?'paused':'offline';
+    const initial=(s.name||'B')[0].toUpperCase();
+    const grad=avatarGrad(s.name||'B');
+    const numTxt=s.ownerNumber?'+'+esc(s.ownerNumber):'—';
+    const idTxt=esc(s.id.substring(0,20))+'…';
+
+    const restBtn=!isOn?`<button class="btn btn-sm btn-ghost-warn" onclick="restartSession('${esc(s.id)}')">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Restart</button>`:'';
+
+    return `<div class="bot-card ${cardCls}">
+      <div class="bot-av-wrap">
+        <div class="bot-av" style="background:${grad}">${initial}</div>
+        <div class="bot-dot ${dotCls}"></div>
+      </div>
+      <div class="bot-info">
+        <div class="bot-name">${esc(s.name||'Unnamed Bot')}</div>
+        <div class="bot-meta"><span>${numTxt}</span><span class="bot-meta-sep"></span><span style="font-family:monospace;font-size:.68rem">${idTxt}</span></div>
+      </div>
+      <div class="bot-status ${badgeCls}"><span class="bot-status-dot"></span>${esc(s.status)}</div>
+      <div class="bot-actions">
+        ${restBtn}
+        <button class="btn btn-sm btn-del" onclick="removeSession('${esc(s.id)}')">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          Remove
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function removeSession(id){
+  if(!confirm('Remove this bot session? It will disconnect immediately.'))return;
+  try{
+    const res=await fetch('/api/session/delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({sessionId:id})});
+    const d=await res.json();
+    if(d.success){toast('Bot removed','success');loadSessions()}else toast(d.message||'Failed to remove','error');
+  }catch(e){toast('Error removing bot','error')}
+}
+
+async function restartSession(id){
+  try{
+    toast('Restarting session…','info',2000);
+    const res=await fetch('/api/session/restart',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({sessionId:id})});
+    const d=await res.json();
+    if(d.success){toast('Session restarted','success');setTimeout(()=>loadSessions(false),3000)}
+    else toast(d.message||'Failed to restart','error');
+  }catch(e){toast('Error restarting session','error')}
+}
+
+/* ── Pair code ── */
+async function getPairCode(){
+  const num=$('p-number').value.trim().replace(/[^0-9]/g,'');
+  const botName=$('p-botname').value.trim()||'Infinity MD Mini';
+  const ownerName=$('p-ownername').value.trim()||'Owner';
+  const refCode=($('p-refcode').value||'').trim().toLowerCase();
+  if(!num){toast('Enter a phone number','error');return}
+  const btn=$('pairBtn');
+  btn.disabled=true;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Generating…';
+  $('pairResult').style.display='none';
+  try{
+    const res=await fetch('/api/pair',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({number:num,botName,ownerName,ownerNumber:num,referralCode:refCode||undefined})});
+    const d=await res.json();
+    if(d.success&&d.code){
+      $('pairCodeDisplay').textContent=d.code;
+      $('pairResult').style.display='block';
+      toast('Pair code ready!','success');
+      setTimeout(()=>loadSessions(false),15000);
+    }else toast(d.message||`Failed (HTTP ${res.status})`,'error');
+  }catch(e){toast(e.message||'Network error','error')}
+  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Get Pair Code'}
+}
+
+/* ── QR code ── */
+async function startQR(){
+  const botName=$('q-botname').value.trim()||'Infinity MD Mini';
+  const ownerName=$('q-ownername').value.trim()||'Owner';
+  const refCode=($('q-refcode').value||'').trim().toLowerCase();
+  const btn=$('qrBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin" style="width:14px;height:14px;border-width:2px"></span>Starting…';
+  $('qrResult').style.display='block';
+  $('qrWrap').innerHTML='<div class="spin"></div><p style="font-size:.78rem;color:var(--text3)">Connecting…</p>';
+  try{
+    const url=`/api/qr?botName=${encodeURIComponent(botName)}&ownerName=${encodeURIComponent(ownerName)}${refCode?'&referralCode='+encodeURIComponent(refCode):''}`;
+    const res=await fetch(url,{credentials:'include'});
+    const d=await res.json().catch(()=>null);
+    if(d&&d.success&&d.qr){
+      $('qrWrap').innerHTML=`<img src="${d.qr}" alt="QR Code"><p style="font-size:.74rem;color:var(--text3);margin-top:2px">Scan with WhatsApp</p>`;
+      toast('QR ready — scan now!','success');
+      setTimeout(()=>loadSessions(false),20000);
+    }else{
+      const msg=(d&&(d.message||d.error))||`Failed (HTTP ${res.status})`;
+      $('qrWrap').innerHTML=`<svg viewBox="0 0 24 24" stroke="var(--red2)" stroke-width="1.5" fill="none" width="32" height="32"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p style="font-size:.8rem;color:var(--red2)">${esc(msg)}</p>`;
+      toast(msg,'error');
+    }
+  }catch(e){
+    $('qrWrap').innerHTML=`<p style="font-size:.8rem;color:var(--red2)">${esc(e.message||'Network error')}</p>`;
+    toast(e.message||'Network error','error');
+  }
+  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>Generate QR Code'}
+}
+
+/* ── Segment tabs ── */
+function switchTab(tab){
+  ['pair','qr'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('tab-btn-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+/* ── Owner tools ── */
+async function doBroadcast(){
+  const message=$('bc-message').value.trim();
+  const target=$('bc-target').value.trim();
+  const resEl=$('bc-result');const btn=$('bcBtn');
+  if(!message){toast('Enter a message','error');return}
+  btn.disabled=true;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Sending…';
+  resEl.style.display='none';
+  try{
+    const res=await fetch('/api/owner/broadcast',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({message,target})});
+    const d=await res.json();
+    if(d.success){
+      resEl.className='alert alert-ok';resEl.style.display='flex';
+      resEl.innerHTML=`<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg><span>Sent to <strong>${d.sent}</strong> bot(s) — ${d.failed} failed</span>`;
+      toast('Broadcast sent!','success');
+    }else{
+      resEl.className='alert alert-warn';resEl.style.display='flex';
+      resEl.innerHTML=`<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${esc(d.message||'Broadcast failed')}</span>`;
+      toast(d.message||'Failed','error');
+    }
+  }catch(e){toast('Network error','error')}
+  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Send Broadcast'}
+}
+
+async function doChannelReact(){
+  const channelUrl=$('cr-channel').value.trim();
+  const messageId=$('cr-msgid').value.trim();
+  const emoji=$('cr-emoji').value.trim()||'❤️';
+  const resEl=$('cr-result');const btn=$('crBtn');
+  if(!channelUrl){toast('Enter a channel link or JID','error');return}
+  btn.disabled=true;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Reacting…';
+  resEl.style.display='none';
+  try{
+    const res=await fetch('/api/owner/channel-react',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({channelUrl,messageId,emoji})});
+    const d=await res.json();
+    if(d.success){
+      resEl.className='alert alert-ok';resEl.style.display='flex';
+      resEl.innerHTML=`<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="20 6 9 17 4 12"/></svg><span><strong>${d.reacted}</strong> bots reacted · ${d.failed} failed</span>`;
+      toast('All bots reacted!','success');
+    }else{
+      resEl.className='alert alert-warn';resEl.style.display='flex';
+      resEl.innerHTML=`<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${esc(d.message||'Reaction failed')}</span>`;
+      toast(d.message||'Failed','error');
+    }
+  }catch(e){toast('Network error','error')}
+  finally{btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>React with All Bots'}
+}
+
+/* ── Language Switcher ── */
+const DASH_LANGS={
+  en:{signOut:'Sign Out'},
+  si:{signOut:'ඉවත් වන්න'},
+  pk:{signOut:'سائن آؤٹ'}
+};
+function dashSetLang(lang){
+  localStorage.setItem('dash_lang',lang);
+  const ids=['dlang-en','dlang-si','dlang-pk'];
+  ids.forEach(id=>{
+    const b=document.getElementById(id);
+    if(!b)return;
+    const isActive=id==='dlang-'+lang;
+    b.style.background=isActive?'rgba(124,58,237,0.25)':'rgba(255,255,255,0.04)';
+    b.style.border=isActive?'1px solid rgba(124,58,237,0.45)':'1px solid rgba(255,255,255,0.06)';
+    b.style.color=isActive?'#f1f5f9':'#94a3b8';
+  });
+  const t=DASH_LANGS[lang]||DASH_LANGS.en;
+  const so=document.querySelector('.sb-foot .ni');
+  if(so)so.childNodes[so.childNodes.length-1].textContent=' '+t.signOut;
+}
+(function(){const l=localStorage.getItem('dash_lang')||'en';dashSetLang(l)})();
+
+/* ── Auth ── */
+let _loginRoute='/login';
+async function logout(){await fetch('/api/auth/logout',{credentials:'include'});window.location.href=_loginRoute}
+
+/* ── Refresh ── */
+async function refresh(){
+  const ic=$('refreshIcon');
+  if(ic){ic.style.transition='none';ic.style.animation='spinning .6s linear 1'}
+  if(currentPage==='sessions')await loadSessions(false);
+  setTimeout(()=>{if(ic)ic.style.animation=''},700);
+}
+
+/* ── Init ── */
+async function init(){
+  try{
+    const r=await fetch('/api/user-info',{credentials:'include'});
+    if(r.status===401||r.status===403){window.location.href=_loginRoute;return}
+    const info=await r.json();
+    if(info&&info.username){
+      if(info.loginRoute)_loginRoute=info.loginRoute;
+      $('userName').textContent=info.username;
+      $('userAv').textContent=info.username[0].toUpperCase();
+      $('userAv').style.background=avatarGrad(info.username);
+      $('userRole').textContent=info.isOwner?'Admin · Owner':'Member';
+      if(info.isOwner){$('nav-owner').style.display='';$('owner-section').style.display=''}
+    }
+  }catch(_){}
+  await loadSessions(false);
+  setInterval(()=>{if(currentPage==='sessions')loadSessions(false)},15000);
+}
+init();
+</script>
+</body>
+</html>

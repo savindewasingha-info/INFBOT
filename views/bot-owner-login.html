@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity MD Mini — Bot Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#04040c;--border:rgba(255,255,255,0.08);--border-focus:rgba(139,92,246,0.6);--purple:#8b5cf6;--cyan:#06b6d4;--text:#f1f5f9;--dim:rgba(255,255,255,0.4)}
+    html,body{height:100%}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow:hidden}
+    .bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(139,92,246,0.18),transparent 60%),radial-gradient(ellipse 55% 55% at 85% 100%,rgba(6,182,212,0.12),transparent 60%)}
+    .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(139,92,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.04) 1px,transparent 1px);background-size:48px 48px}
+    .page{position:relative;z-index:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .card{width:100%;max-width:420px;background:rgba(10,10,20,0.88);border:1px solid var(--border);border-radius:24px;padding:40px 36px;backdrop-filter:blur(32px);box-shadow:0 40px 80px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06)}
+    .logo{text-align:center;margin-bottom:32px}
+    .logo-icon{width:64px;height:64px;border-radius:18px;margin:0 auto 14px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 0 0 8px rgba(124,58,237,0.08),0 20px 40px rgba(124,58,237,0.3);animation:pulse-glow 3s ease-in-out infinite}
+    @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 8px rgba(124,58,237,0.08),0 20px 40px rgba(124,58,237,0.3)}50%{box-shadow:0 0 0 12px rgba(124,58,237,0.12),0 24px 48px rgba(124,58,237,0.45)}}
+    .logo h2{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,#a78bfa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .logo p{color:var(--dim);font-size:.85rem;margin-top:4px}
+    .badge{display:inline-block;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:8px;letter-spacing:.05em;text-transform:uppercase}
+    label{display:block;font-size:.8rem;font-weight:600;color:var(--dim);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+    input{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
+    input::placeholder{color:rgba(255,255,255,0.2)}
+    input:focus{border-color:var(--border-focus);background:rgba(139,92,246,0.06);box-shadow:0 0 0 3px rgba(139,92,246,0.12)}
+    .form-group{margin-bottom:18px}
+    .btn{width:100%;padding:13px;border-radius:12px;font-size:.95rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+    .btn-primary{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 8px 24px rgba(124,58,237,0.35)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,58,237,0.5)}
+    .btn-primary:active{transform:translateY(0)}
+    .btn-primary:disabled{opacity:.5;transform:none;cursor:not-allowed}
+    .error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;font-size:.85rem;padding:12px 16px;border-radius:10px;margin-bottom:16px;display:none}
+    .footer-link{text-align:center;margin-top:20px;font-size:.82rem;color:var(--dim)}
+    .footer-link a{color:var(--purple);text-decoration:none;font-weight:600;transition:color .2s}
+    .footer-link a:hover{color:#a78bfa}
+    .powered{text-align:center;margin-top:28px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .powered-label{color:rgba(255,255,255,0.2);font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px}
+    .powered-name{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:900;background:linear-gradient(135deg,#fbbf24,#f97316,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-name 2.5s ease-in-out infinite alternate}
+    @keyframes glow-name{from{filter:drop-shadow(0 0 4px rgba(245,158,11,0.3))}to{filter:drop-shadow(0 0 10px rgba(245,158,11,0.7))}}
+    .star-spin{animation:star-rot 5s linear infinite;display:inline-block;font-size:.85rem;color:rgba(245,158,11,0.6)}
+    @keyframes star-rot{to{transform:rotate(360deg)}}
+    @media(max-width:480px){.page{padding:16px}.card{padding:28px 22px;border-radius:18px}}
+  </style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="grid-bg"></div>
+<div class="page">
+  <div>
+    <div class="card">
+      <div class="logo">
+        <div class="logo-icon">🤖</div>
+        <h2>INFINITY MD MINI</h2>
+        <p>Bot Control Panel</p>
+        <span class="badge">Owner Access</span>
+      </div>
+      <div class="error" id="errMsg"></div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter owner username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Access Bot Control</button>
+      <div class="footer-link">
+        <a href="/">← Back to Home</a>
+      </div>
+    </div>
+    <div class="powered">
+      <span class="star-spin">✦</span>
+      <span class="powered-label">Powered by</span>
+      <span class="powered-name">INFINITY MD MINI</span>
+      <span class="star-spin" style="animation-direction:reverse">✦</span>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  async function doLogin() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const errEl = document.getElementById('errMsg');
+    const btn = document.getElementById('loginBtn');
+    errEl.style.display = 'none';
+    if (!username || !password) { errEl.textContent = 'Please enter username and password.'; errEl.style.display = 'block'; return; }
+    btn.disabled = true; btn.textContent = 'Verifying…';
+    try {
+      const r = await fetch('/bot-owner/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+      const d = await r.json();
+      if (d.success) { window.location.href = '/bot-owner/dashboard'; }
+      else { errEl.textContent = d.message || 'Invalid credentials.'; errEl.style.display = 'block'; }
+    } catch (e) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+    finally { btn.disabled = false; btn.textContent = 'Access Bot Control'; }
+  }
+</script>
+</body>
+</html>

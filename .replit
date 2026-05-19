@@ -1,0 +1,61 @@
+modules = ["nodejs-20", "web", "bash", "nix"]
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[nix]
+channel = "stable-25_05"
+packages = ["ffmpeg", "pkg-config", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=5000 node --max-old-space-size=800 index.js"
+waitForPort = 5000
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["npm", "start"]
+
+[userenv]
+
+[userenv.development]
+DEV_MODE = "false"
+
+[userenv.shared]
+NODE_ENV = "production"
+PORT = "5000"
+FIREBASE_API_KEY = "AIzaSyBRoTFN1U0F1YgpPmcP9GP7y4brsGolFjQ"
+FIREBASE_AUTH_DOMAIN = "cupcake-25862.firebaseapp.com"
+FIREBASE_DATABASE_URL = "https://cupcake-25862-default-rtdb.firebaseio.com"
+FIREBASE_PROJECT_ID = "cupcake-25862"
+FIREBASE_STORAGE_BUCKET = "cupcake-25862.firebasestorage.app"
+FIREBASE_MESSAGING_SENDER_ID = "479443761968"
+FIREBASE_APP_ID = "1:479443761968:web:53d2094960eb83a386e6f5"
+FIREBASE_MEASUREMENT_ID = "G-8B2L4D0983"

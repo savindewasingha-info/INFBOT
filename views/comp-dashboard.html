@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infinity MD — My Competition Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#04040c;--surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);--border:rgba(255,255,255,0.08);--purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.15);--cyan:#06b6d4;--cyan-dim:rgba(6,182,212,0.12);--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#f1f5f9;--dim:rgba(255,255,255,0.45);--muted:rgba(255,255,255,0.3)}
+    html,body{height:100%;min-height:100vh}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    .bg-mesh{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 80% 55% at 50% -10%,rgba(139,92,246,0.14),transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(6,182,212,0.08),transparent 60%)}
+    .grid-lines{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(139,92,246,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.03) 1px,transparent 1px);background-size:60px 60px}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(4,4,12,0.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 20px;justify-content:space-between}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;background:linear-gradient(135deg,#a78bfa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-brand span{font-size:1.4rem}
+    .nav-right{display:flex;align-items:center;gap:12px}
+    .badge-comp{background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
+    .btn-logout{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;font-size:.8rem;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+    .btn-logout:hover{background:rgba(239,68,68,0.2)}
+
+    .main{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:80px 20px 40px}
+    .greeting{margin-bottom:28px}
+    .greeting h1{font-size:1.8rem;font-weight:800;margin-bottom:4px}
+    .greeting p{color:var(--dim);font-size:.95rem}
+
+    .card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px}
+    .card-title{font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
+
+    /* Stats */
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+    .stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:18px 16px;text-align:center}
+    .stat-val{font-size:2rem;font-weight:800;line-height:1}
+    .stat-lbl{font-size:.75rem;color:var(--dim);margin-top:6px;font-weight:500}
+    .stat-gold .stat-val{color:#f59e0b}
+    .stat-purple .stat-val{background:linear-gradient(135deg,#a78bfa,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .stat-green .stat-val{color:#10b981}
+
+    /* Referral code */
+    .code-display{background:rgba(139,92,246,0.08);border:2px dashed rgba(139,92,246,0.3);border-radius:14px;padding:22px;text-align:center;margin-bottom:16px}
+    .code-text{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:700;letter-spacing:.15em;color:#a78bfa;word-break:break-all}
+    .code-sub{font-size:.8rem;color:var(--dim);margin-top:8px}
+    .code-empty{color:var(--muted);font-size:.95rem;padding:10px 0}
+    .btn{padding:12px 24px;border-radius:12px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:8px}
+    .btn-primary{background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;width:100%;justify-content:center}
+    .btn-primary:hover{opacity:.9}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+    .btn-copy{background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;padding:8px 18px;font-size:.82rem}
+    .btn-copy:hover{background:rgba(139,92,246,0.25)}
+
+    /* Countdown */
+    .countdown-box{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:.88rem;color:#67e8f9}
+    .countdown-box strong{font-family:'Orbitron',monospace;font-size:.92rem}
+
+    /* Result banner */
+    .result-banner{border-radius:18px;padding:28px 24px;margin-bottom:20px;text-align:center}
+    .result-banner.passed{background:rgba(16,185,129,0.08);border:2px solid rgba(16,185,129,0.35)}
+    .result-banner.eliminated{background:rgba(239,68,68,0.07);border:2px solid rgba(239,68,68,0.25)}
+    .result-icon{font-size:3.5rem;margin-bottom:10px}
+    .result-title{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+    .result-banner.passed .result-title{color:#6ee7b7}
+    .result-banner.eliminated .result-title{color:#fca5a5}
+    .result-sub{font-size:.92rem;color:var(--dim)}
+
+    /* Leaderboard */
+    .lb-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+    .lb-row:last-child{border-bottom:none}
+    .lb-row.elim{opacity:.5}
+    .lb-rank{width:36px;font-size:.9rem;font-weight:700;color:var(--dim)}
+    .lb-rank.r1{color:#f59e0b}
+    .lb-rank.r2{color:#94a3b8}
+    .lb-rank.r3{color:#cd7c2a}
+    .lb-name{flex:1;font-weight:600;font-size:.9rem}
+    .lb-name.me{color:#a78bfa}
+    .lb-pts{font-size:.9rem;font-weight:700;color:#10b981;margin-right:10px}
+    .lb-pts.low{color:#ef4444}
+    .me-pill{font-size:.68rem;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;padding:2px 7px;border-radius:20px;margin-left:8px;vertical-align:middle}
+    .pill-pass{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7}
+    .pill-elim{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5}
+
+    .toast{position:fixed;bottom:24px;right:24px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;padding:12px 20px;border-radius:12px;font-size:.88rem;font-weight:600;z-index:999;animation:slideIn .3s ease;max-width:300px}
+    .toast.err{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5}
+    @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    .info-box{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);color:#67e8f9;font-size:.83rem;padding:12px 16px;border-radius:10px;line-height:1.5}
+    @media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}}
+  </style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="grid-lines"></div>
+
+<nav>
+  <div class="nav-brand"><span>🏆</span> Infinity MD</div>
+  <div class="nav-right">
+    <span class="badge-comp">Competitor</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="greeting">
+    <h1 id="greetName">Loading…</h1>
+    <p id="greetSub">Competition dashboard</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat stat-purple">
+      <div class="stat-val" id="statPoints">—</div>
+      <div class="stat-lbl">Total Points</div>
+    </div>
+    <div class="stat stat-gold">
+      <div class="stat-val" id="statRank">—</div>
+      <div class="stat-lbl">Current Rank</div>
+    </div>
+    <div class="stat stat-green">
+      <div class="stat-val" id="statTotal">—</div>
+      <div class="stat-lbl">Competitors</div>
+    </div>
+  </div>
+
+  <!-- Result banner (shown only when ended) -->
+  <div id="resultBanner" style="display:none"></div>
+
+  <!-- Referral Code (hidden when ended) -->
+  <div class="card" id="referralCard">
+    <div class="card-title">🔗 My Referral Code</div>
+    <div id="codeSection">
+      <div class="code-display"><div class="code-empty">Loading…</div></div>
+    </div>
+    <div id="countdownBox"></div>
+    <div class="info-box">Share your referral code — when someone links a WhatsApp bot using your code, you earn <strong>+1 point</strong>. Each new bot counts once.</div>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="card">
+    <div class="card-title" id="lbTitle">📊 Competition Leaderboard</div>
+    <div id="leaderboard"><div style="color:var(--muted);font-size:.9rem">Loading…</div></div>
+  </div>
+</div>
+
+<script>
+let myUsername = '';
+let myCode = null;
+let competitionEnded = false;
+let minPoints = 10;
+let myPoints = 0;
+let endDate = null;
+let countdownTimer = null;
+
+function toast(msg, err = false) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (err ? ' err' : '');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function logout() {
+  await fetch('/comp/logout', { method: 'POST' });
+  window.location.href = '/comp';
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtCountdown(ms) {
+  if (ms <= 0) return null;
+  const totalSec = Math.floor(ms / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  return `${m}m ${s}s`;
+}
+
+function startCountdown() {
+  if (countdownTimer) clearInterval(countdownTimer);
+  if (!endDate) return;
+  function tick() {
+    const remaining = endDate - Date.now();
+    const box = document.getElementById('countdownBox');
+    if (remaining <= 0) {
+      clearInterval(countdownTimer);
+      box.innerHTML = '';
+      location.reload();
+      return;
+    }
+    box.innerHTML = `<div class="countdown-box">⏳ Competition ends in <strong>${fmtCountdown(remaining)}</strong></div>`;
+  }
+  tick();
+  countdownTimer = setInterval(tick, 1000);
+}
+
+async function loadMe() {
+  const r = await fetch('/comp/api/me');
+  if (!r.ok) { window.location.href = '/comp'; return; }
+  const d = await r.json();
+  myUsername = d.username;
+  myCode = d.referralCode;
+  myPoints = d.points;
+  competitionEnded = d.competitionEnded || false;
+  minPoints = d.minPoints != null ? d.minPoints : 10;
+  endDate = d.competitionEndDate || null;
+
+  document.getElementById('greetName').textContent = 'Welcome, ' + d.firstName + '!';
+  document.getElementById('greetSub').textContent = 'Competition: ' + (d.competitionName || 'Active');
+  document.getElementById('statPoints').textContent = d.points;
+
+  if (competitionEnded) {
+    showResultBanner();
+  } else {
+    startCountdown();
+  }
+  renderCode();
+}
+
+function showResultBanner() {
+  const passed = myPoints >= minPoints;
+  const banner = document.getElementById('resultBanner');
+  banner.style.display = 'block';
+  banner.className = 'result-banner ' + (passed ? 'passed' : 'eliminated');
+  banner.innerHTML = `
+    <div class="result-icon">${passed ? '🏆' : '❌'}</div>
+    <div class="result-title">${passed ? 'Qualified!' : 'Eliminated'}</div>
+    <div class="result-sub">${passed
+      ? `You scored <strong>${myPoints} points</strong> — above the minimum of ${minPoints}. Congratulations!`
+      : `You scored <strong>${myPoints} points</strong> — the minimum required was ${minPoints}.`
+    }</div>
+  `;
+  document.getElementById('referralCard').style.display = 'none';
+  document.getElementById('lbTitle').textContent = '📊 Final Results';
+}
+
+function renderCode() {
+  if (competitionEnded) return;
+  const sec = document.getElementById('codeSection');
+  if (myCode) {
+    sec.innerHTML = `
+      <div class="code-display">
+        <div class="code-text" id="codeVal">${myCode}</div>
+        <div class="code-sub">Share this code with people linking a new WhatsApp bot</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button class="btn btn-copy" onclick="copyCode()">📋 Copy Code</button>
+        <button class="btn btn-copy" onclick="copyLink()">🔗 Copy Link</button>
+      </div>
+    `;
+  } else {
+    sec.innerHTML = `
+      <div class="code-display">
+        <div class="code-empty">You haven't generated your referral code yet</div>
+      </div>
+      <button class="btn btn-primary" id="genBtn" onclick="generateCode()" style="margin-bottom:14px">✨ Generate My Referral Code</button>
+    `;
+  }
+}
+
+async function generateCode() {
+  const btn = document.getElementById('genBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+  try {
+    const r = await fetch('/comp/api/generate-code', { method: 'POST' });
+    const d = await r.json();
+    if (d.success && d.code) {
+      myCode = d.code;
+      renderCode();
+      toast('Referral code generated!');
+    } else {
+      toast(d.message || 'Failed to generate code', true);
+      if (btn) { btn.disabled = false; btn.textContent = '✨ Generate My Referral Code'; }
+    }
+  } catch (e) {
+    toast('Network error', true);
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Generate My Referral Code'; }
+  }
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(myCode).then(() => toast('Code copied!')).catch(() => toast('Copy failed', true));
+}
+
+function copyLink() {
+  const link = window.location.origin + '/link?ref=' + encodeURIComponent(myCode);
+  navigator.clipboard.writeText(link).then(() => toast('Link copied!')).catch(() => toast('Copy failed', true));
+}
+
+async function loadLeaderboard() {
+  const r = await fetch('/comp/api/leaderboard');
+  if (!r.ok) return;
+  const list = await r.json();
+  const me = list.find(c => c.username === myUsername);
+  document.getElementById('statRank').textContent = me?.rank || '—';
+  document.getElementById('statTotal').textContent = list.length;
+  const el = document.getElementById('leaderboard');
+  if (!list.length) { el.innerHTML = '<div style="color:var(--muted);font-size:.9rem">No competitors yet.</div>'; return; }
+  el.innerHTML = list.map(c => {
+    const rankClass = c.rank === 1 ? 'r1' : c.rank === 2 ? 'r2' : c.rank === 3 ? 'r3' : '';
+    const isMe = c.username === myUsername;
+    const medal = c.rank === 1 ? '🥇' : c.rank === 2 ? '🥈' : c.rank === 3 ? '🥉' : c.rank;
+    const isElim = c.eliminated;
+    const isPassed = c.passed;
+    const resultBadge = isPassed
+      ? '<span class="pill-pass">✅ Qualified</span>'
+      : isElim ? '<span class="pill-elim">❌ Eliminated</span>' : '';
+    return `<div class="lb-row${isElim ? ' elim' : ''}">
+      <div class="lb-rank ${rankClass}">${medal}</div>
+      <div class="lb-name ${isMe ? 'me' : ''}">${esc(c.firstName)}${isMe ? '<span class="me-pill">you</span>' : ''} ${resultBadge}</div>
+      <div class="lb-pts${isElim ? ' low' : ''}">${c.points} pts</div>
+    </div>`;
+  }).join('');
+}
+
+async function init() {
+  await loadMe();
+  await loadLeaderboard();
+  setInterval(loadLeaderboard, 30000);
+}
+init();
+</script>
+</body>
+</html>
